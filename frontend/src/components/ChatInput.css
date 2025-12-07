@@ -1,0 +1,116 @@
+.chat-input-container {
+  padding: 1.5rem;
+  border-top: none;
+  background-color: #212121;
+  display: flex;
+  justify-content: center;
+}
+
+.chat-input-wrapper {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+  background-color: #2f2f2f;
+  border: 1px solid #4d4d4d;
+  border-radius: 24px;
+  padding: 0.75rem 1rem;
+  transition: all 0.2s;
+  max-width: 800px;
+  width: 100%;
+}
+
+.chat-input-wrapper:focus-within {
+  border-color: #565656;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05);
+}
+
+.chat-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: #ececec;
+  font-size: 1rem;
+  resize: none;
+  max-height: 200px;
+  overflow-y: auto;
+  line-height: 1.5;
+}
+
+.chat-input::placeholder {
+  color: #8e8e8e;
+}
+
+.chat-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.chat-input-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.icon-button {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  color: #8e8e8e;
+  transition: all 0.2s;
+}
+
+.icon-button:hover:not(:disabled) {
+  background-color: #3a3a3a;
+  color: #ececec;
+}
+
+.icon-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.icon-button.recording {
+  background-color: #ef4444;
+  color: white;
+  animation: pulse 1.5s infinite;
+}
+
+.icon-button.send {
+  background-color: #ececec;
+  color: #171717;
+  border-radius: 50%;
+}
+
+.icon-button.send:hover:not(:disabled) {
+  background-color: #c5c5c5;
+}
+
+.icon-button.send:disabled {
+  background-color: transparent;
+  color: #4d4d4d;
+}
+
+.icon-button.stop {
+  background-color: #ef4444;
+  color: white;
+}
+
+.chat-input-hint {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  text-align: center;
+}
+
+.chat-input-hint kbd {
+  background-color: var(--bg-tertiary);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.7rem;
+  border: 1px solid var(--border);
+}

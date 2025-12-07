@@ -1,0 +1,55 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+backend/venv/
+backend/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Build outputs
+dist/
+frontend/dist/
+build/
+*.egg-info/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+backend/logs/
+
+# Test coverage
+coverage/
+.coverage
+.pytest_cache/
+.vitest/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# User data (for development)
+.jarvis/
+
+# Package manager
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
