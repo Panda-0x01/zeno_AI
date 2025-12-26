@@ -8,8 +8,16 @@ class Settings(BaseSettings):
     
     # Ollama
     OLLAMA_BASE_URL: str = "http://localhost:11434"
-    DEFAULT_MODEL: str = "llama2"
-    MAX_CONTEXT_TOKENS: int = 4096
+    DEFAULT_MODEL: str = "llama3.2:1b"  # Smaller model for low-end PCs
+    MAX_CONTEXT_TOKENS: int = 2048  # Reduced for low-end PCs
+    
+    # Performance optimizations for low-end PCs
+    LOW_MEMORY_MODE: bool = True
+    MAX_CONCURRENT_REQUESTS: int = 1  # Reduced to 1 for very low-end PCs
+    REQUEST_TIMEOUT: int = 60  # Increased timeout for slower processing
+    ENABLE_RESPONSE_CACHING: bool = True
+    CACHE_SIZE_MB: int = 32  # Reduced cache size
+    STREAM_CHUNK_SIZE: int = 512  # Smaller chunks for better responsiveness
     
     # Server
     BACKEND_HOST: str = "127.0.0.1"
@@ -27,6 +35,13 @@ class Settings(BaseSettings):
     TTS_ENGINE: str = "web"
     WAKE_WORD_ENABLED: bool = False
     PORCUPINE_ACCESS_KEY: str = ""
+    
+    # Database
+    MYSQL_HOST: str = "localhost"
+    MYSQL_PORT: int = 3306
+    MYSQL_USER: str = "jarvis"
+    MYSQL_PASSWORD: str = "jarvis123"
+    MYSQL_DATABASE: str = "jarvis_db"
     
     # Paths
     DATA_DIR: Path = Path.home() / ".jarvis"

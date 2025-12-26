@@ -149,7 +149,7 @@ export default function ChatInterface() {
       <div className="chat-interface empty">
         <div className="empty-state">
           <h2>Welcome to Zeno</h2>
-          <p>Your local AI assistant powered by Ollama</p>
+          <p>Your local AI assistant </p>
           {availableModels.length === 0 && (
             <div className="warning-box">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">

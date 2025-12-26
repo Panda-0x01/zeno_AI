@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useAppStore } from './store/appStore';
+import { performanceService } from './services/performanceService';
 import ChatInterface from './components/ChatInterface';
 import Sidebar from './components/Sidebar';
 import Settings from './components/Settings';
@@ -14,6 +15,9 @@ function App() {
   }, [theme]);
 
   useEffect(() => {
+    // Initialize performance optimizations
+    performanceService.isLowEnd();
+    
     // Initialize backend connection
     initializeBackend();
 
@@ -30,6 +34,9 @@ function App() {
     }
 
     return () => {
+      // Cleanup performance monitoring
+      performanceService.cleanup();
+      
       if (window.electronAPI) {
         window.electronAPI.removeAllListeners('focus-chat-input');
         window.electronAPI.removeAllListeners('open-settings');

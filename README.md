@@ -2,6 +2,10 @@
 
 A cross-platform desktop AI assistant powered by Ollama, featuring voice I/O, local-first privacy, and extensible plugin system.
 
+**🎉 100% FREE & Open Source** - MIT License
+
+**⚡ Optimized for Low-End PCs** - Runs smoothly on 2GB RAM systems!
+
 ## 🏗️ Architecture
 
 ```
@@ -21,11 +25,31 @@ React (TypeScript) + Vite
 - 🤖 **Ollama Integration**: Full model management, streaming responses, context window control
 - 🎤 **Voice I/O**: Web Speech API + optional offline STT (Whisper/VOSK), TTS with multiple voices
 - 🔐 **Security First**: Local-only by default, encrypted storage, sandboxed execution, audit logging
-- 🎨 **Polished UI**: Light/dark themes, accessibility (ARIA, screen readers), keyboard shortcuts
+- 🎨 **Polished UI**: Light/dark themes, blurred glass morphism backgrounds, accessibility (ARIA, screen readers), keyboard shortcuts
 - 🔌 **Plugin System**: User-defined commands with permission controls
 - 📦 **Cross-Platform**: Windows, macOS, Linux installers
+- ⚡ **Performance Optimized**: Automatic low-end device detection, reduced animations, memory management
+
+## 🖥️ Low-End PC Support
+
+This project is specifically optimized for older and low-end hardware:
+
+- **Minimum**: 2GB RAM, Dual-core CPU
+- **Recommended**: 4GB RAM, Quad-core CPU
+- **Auto-detects** device capabilities and adjusts performance
+- **Smaller AI models** (1B parameters) for faster responses
+- **Reduced visual effects** on weak hardware
+- **Memory management** and cleanup optimizations
+
+See [LOW_END_PC_OPTIMIZATION.md](LOW_END_PC_OPTIMIZATION.md) for detailed optimization guide.
 
 ## 🚀 Quick Start
+
+### For Low-End PCs (Recommended)
+```bash
+# Quick setup for low-end systems
+setup_low_end.bat
+```
 
 ### Prerequisites
 

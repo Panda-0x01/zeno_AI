@@ -61,7 +61,7 @@ class WebSocketHandler:
     async def handle_chat(self, websocket: WebSocket, data: Dict[str, Any], request_id: str):
         """Handle chat message with streaming"""
         messages = data.get("messages", [])
-        model = data.get("model", "llama2")
+        model = data.get("model", "llama3.2:1b")  # Use the optimized model as default
         
         print(f"[CHAT] Received chat request - Model: {model}, Messages: {len(messages)}")
         

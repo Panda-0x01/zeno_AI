@@ -52,8 +52,8 @@ interface AppState {
 }
 
 const defaultSettings: AppSettings = {
-  model: 'llama2',
-  maxTokens: 4096,
+  model: 'llama3.2:1b',  // Use the optimized model
+  maxTokens: 2048,       // Reduced for low-end PCs
   temperature: 0.7,
   sttEngine: 'web',
   ttsEngine: 'web',
@@ -75,7 +75,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   conversations: [],
   currentConversationId: null,
   availableModels: [],
-  currentModel: 'llama2',
+  currentModel: 'llama3.2:1b',  // Use the optimized model
   settings: defaultSettings,
   backendService: null,
   isBackendConnected: false,

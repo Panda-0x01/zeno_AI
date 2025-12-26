@@ -34,6 +34,23 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  /* Performance optimizations for low-end PCs */
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  -o-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* Performance optimizations */
+html {
+  /* Enable hardware acceleration */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  /* Optimize rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeSpeed;
 }
 
 body {
@@ -45,6 +62,12 @@ body {
   background-color: #212121;
   color: #ececec;
   overflow: hidden;
+  /* Performance optimizations */
+  will-change: auto;
+  contain: layout style paint;
+  /* Reduce repaints */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 body[data-theme='dark'] {
@@ -105,7 +128,7 @@ input, textarea {
   outline-offset: 2px;
 }
 
-/* Animations */
+/* Animations - optimized for performance */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -132,5 +155,80 @@ input, textarea {
   }
   50% {
     opacity: 0.5;
+  }
+}
+
+/* Performance optimizations for low-end devices */
+@media (max-width: 768px), (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.1s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.1s !important;
+  }
+  
+  /* Disable expensive effects on mobile/low-end */
+  .app::before {
+    display: none;
+  }
+  
+  .main-content {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+/* Low memory mode */
+@media (max-width: 480px) {
+  * {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+/* Low-end device specific optimizations */
+.low-end-device * {
+  /* Disable all expensive effects */
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+.low-end-device .app::before {
+  display: none;
+}
+
+.low-end-device .main-content {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Ultra low-end mode for very weak devices */
+@media (max-width: 480px), (max-height: 600px) {
+  .app {
+    background: linear-gradient(135deg, #333 0%, #555 100%);
+  }
+  
+  .app::before {
+    display: none;
+  }
+  
+  .main-content {
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    margin: 5px;
+    border-radius: 5px;
   }
 }
