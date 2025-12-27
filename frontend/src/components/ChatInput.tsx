@@ -2,7 +2,10 @@ import { useState, useRef, KeyboardEvent, useEffect } from 'react';
 import { useAppStore } from '../store/appStore';
 import { voiceService } from '../services/voiceService';
 import { FileService } from '../services/fileService';
-import { Mic, MicOff, Send, Square, Paperclip, X, Image, FileText } from 'lucide-react';
+import { 
+  Mic, MicOff, Send, Square, Paperclip, X, Image, FileText, 
+  Upload, ImagePlus
+} from 'lucide-react';
 import './ChatInput.css';
 
 interface ChatInputProps {
@@ -21,9 +24,12 @@ export default function ChatInput({ onSend, onStop, isGenerating, disabled }: Ch
   const [retryCount, setRetryCount] = useState(0);
   const [attachments, setAttachments] = useState<File[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [showUploadMenu, setShowUploadMenu] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const uploadMenuRef = useRef<HTMLDivElement>(null);
   
   const { settings } = useAppStore();
   const maxRetries = 3;
@@ -47,9 +53,19 @@ export default function ChatInput({ onSend, onStop, isGenerating, disabled }: Ch
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
     
+    // Click outside handler for upload menu
+    const handleClickOutside = (event: MouseEvent) => {
+      if (uploadMenuRef.current && !uploadMenuRef.current.contains(event.target as Node)) {
+        setShowUploadMenu(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
@@ -83,6 +99,31 @@ export default function ChatInput({ onSend, onStop, isGenerating, disabled }: Ch
 
   const handleFileSelect = () => {
     fileInputRef.current?.click();
+    setShowUploadMenu(false);
+  };
+
+  const handleImageSelect = () => {
+    imageInputRef.current?.click();
+    setShowUploadMenu(false);
+  };
+
+  const toggleUploadMenu = () => {
+    setShowUploadMenu(!showUploadMenu);
+  };
+
+  const handleMenuAction = (action: string) => {
+    setShowUploadMenu(false);
+    
+    switch (action) {
+      case 'files':
+        handleFileSelect();
+        break;
+      case 'images':
+        handleImageSelect();
+        break;
+      default:
+        break;
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -438,24 +479,64 @@ export default function ChatInput({ onSend, onStop, isGenerating, disabled }: Ch
       )}
 
       <div className="chat-input-wrapper">
+        {/* Hidden file inputs */}
         <input
           ref={fileInputRef}
           type="file"
           multiple
-          accept="image/*,.txt,.md,.js,.ts,.jsx,.tsx,.py,.java,.cpp,.c,.html,.css,.json,.pdf"
+          accept=".txt,.md,.js,.ts,.jsx,.tsx,.py,.java,.cpp,.c,.html,.css,.json,.pdf,.xml,.yaml,.yml"
           onChange={handleFileChange}
           style={{ display: 'none' }}
         />
         
-        <button
-          className="icon-button attach"
-          onClick={handleFileSelect}
-          disabled={disabled || isGenerating || isAutoSending}
-          aria-label="Attach files"
-          title="Attach images or text files"
-        >
-          <Paperclip size={20} />
-        </button>
+        <input
+          ref={imageInputRef}
+          type="file"
+          multiple
+          accept="image/*"
+          onChange={handleFileChange}
+          style={{ display: 'none' }}
+        />
+        
+        {/* Enhanced Upload Menu */}
+        <div className="upload-menu-container" ref={uploadMenuRef}>
+          <button
+            className="icon-button attach"
+            onClick={toggleUploadMenu}
+            disabled={disabled || isGenerating || isAutoSending}
+            aria-label="Upload options"
+            title="Upload files or choose AI actions"
+          >
+            <Paperclip size={20} />
+          </button>
+          
+          {showUploadMenu && (
+            <div className="upload-menu">
+              <div className="upload-menu-header">
+                <Paperclip size={16} />
+                <span>Add photos & files</span>
+              </div>
+              
+              <div className="upload-menu-items">
+                <button
+                  className="upload-menu-item"
+                  onClick={() => handleMenuAction('files')}
+                >
+                  <Upload size={18} />
+                  <span>Add photos & files</span>
+                </button>
+                
+                <button
+                  className="upload-menu-item"
+                  onClick={() => handleMenuAction('images')}
+                >
+                  <ImagePlus size={18} />
+                  <span>Add images only</span>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
 
         <textarea
           ref={textareaRef}
