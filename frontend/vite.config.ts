@@ -8,6 +8,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     emptyOutDir: true,
+    // CSP-friendly build settings
     rollupOptions: {
       output: {
         manualChunks: {
@@ -16,6 +17,10 @@ export default defineConfig({
         },
       },
     },
+    // Disable inline CSS for CSP compliance
+    cssCodeSplit: true,
+    // Generate source maps for debugging
+    sourcemap: true,
   },
   resolve: {
     alias: {
@@ -25,6 +30,10 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
+    // Add security headers for development
+    headers: {
+      'Content-Security-Policy': "default-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:* ws://localhost:* ws://127.0.0.1:*; img-src 'self' data: blob:; font-src 'self' data:;",
+    },
   },
   test: {
     globals: true,

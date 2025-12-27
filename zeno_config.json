@@ -1,0 +1,40 @@
+{
+  "services": {
+    "ollama": {
+      "port": 11434,
+      "healthEndpoint": "/api/tags",
+      "startCommand": "ollama serve",
+      "requiredModel": "llama3.2:1b",
+      "startupDelay": 5
+    },
+    "backend": {
+      "port": 8765,
+      "healthEndpoint": "/health",
+      "startCommand": "python main.py",
+      "workingDirectory": "backend",
+      "startupDelay": 8
+    },
+    "frontend": {
+      "port": 5173,
+      "healthEndpoint": "/",
+      "startCommand": "npm run dev",
+      "workingDirectory": "frontend",
+      "startupDelay": 10
+    }
+  },
+  "monitoring": {
+    "healthCheckInterval": 30,
+    "maxRestartAttempts": 3,
+    "restartDelay": 5
+  },
+  "security": {
+    "wsToken": "3uk2YiCS6KdWML7xwosyIHcDgqa1PBvnRF8m9VEeGj54Ozr0XbfQAlTUJtNhZp",
+    "allowedOrigins": ["http://localhost:5173", "http://127.0.0.1:5173"]
+  },
+  "performance": {
+    "lowEndMode": true,
+    "maxConcurrentRequests": 1,
+    "contextTokens": 2048,
+    "cacheSize": 32
+  }
+}

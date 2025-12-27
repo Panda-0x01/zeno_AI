@@ -24,7 +24,7 @@ React (TypeScript) + Vite
 
 - 🤖 **Ollama Integration**: Full model management, streaming responses, context window control
 - 🎤 **Voice I/O**: Web Speech API + optional offline STT (Whisper/VOSK), TTS with multiple voices
-- 🔐 **Security First**: Local-only by default, encrypted storage, sandboxed execution, audit logging
+- 🔐 **Security First**: Local-only by default, encrypted storage, sandboxed execution, audit logging, Content Security Policy (CSP)
 - 🎨 **Polished UI**: Light/dark themes, blurred glass morphism backgrounds, accessibility (ARIA, screen readers), keyboard shortcuts
 - 🔌 **Plugin System**: User-defined commands with permission controls
 - 📦 **Cross-Platform**: Windows, macOS, Linux installers
@@ -44,6 +44,41 @@ This project is specifically optimized for older and low-end hardware:
 See [LOW_END_PC_OPTIMIZATION.md](LOW_END_PC_OPTIMIZATION.md) for detailed optimization guide.
 
 ## 🚀 Quick Start
+
+### ⚡ One-Click Startup (Recommended)
+```bash
+# Windows - Double-click or run:
+Zeno_AI.bat
+
+# Or use PowerShell:
+.\start_zeno.ps1
+
+# Or use npm:
+npm run start:all
+```
+
+### 🔧 Manual Setup (First Time)
+```bash
+# 1. Install dependencies
+npm run setup:complete
+
+# 2. Start all services
+npm run start:all
+```
+
+### 📋 Individual Commands
+```bash
+# Start services individually
+npm run start:ollama    # Start Ollama
+npm run start:backend   # Start Python backend  
+npm run start:frontend  # Start React frontend
+
+# Health checks
+npm run health:check    # Check all services
+
+# Stop everything
+npm run stop:all        # Stop all services
+```
 
 ### For Low-End PCs (Recommended)
 ```bash

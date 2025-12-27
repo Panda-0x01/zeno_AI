@@ -12,8 +12,8 @@ export class BackendService {
     if (window.electronAPI) {
       this.config = await window.electronAPI.getBackendConfig();
     } else {
-      // Fallback for web development - read from localStorage or use empty token
-      const storedToken = localStorage.getItem('ws_token') || '';
+      // Fallback for web development - use the known token from .env
+      const storedToken = localStorage.getItem('ws_token') || '3uk2YiCS6KdWML7xwosyIHcDgqa1PBvnRF8m9VEeGj54Ozr0XbfQAlTUJtNhZp';
       this.config = { port: 8765, token: storedToken };
     }
 
@@ -156,6 +156,74 @@ export class BackendService {
           reject(new Error('Chat request timeout'));
         }
       }, 120000);
+    });
+  }
+
+  async sendChatWithFiles(
+    messages: Array<{ role: string; content: string }>,
+    model: string,
+    files: File[],
+    onStream?: (chunk: string) => void
+  ): Promise<string> {
+    return new Promise(async (resolve, reject) => {
+      if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+        reject(new Error('WebSocket not connected'));
+        return;
+      }
+
+      try {
+        // Convert files to base64
+        const filesData = await Promise.all(
+          files.map(async (file) => {
+            const arrayBuffer = await file.arrayBuffer();
+            const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+            
+            return {
+              filename: file.name,
+              content_type: file.type,
+              data: base64,
+              size: file.size
+            };
+          })
+        );
+
+        const requestId = crypto.randomUUID();
+        let fullResponse = '';
+
+        this.messageHandlers.set(requestId, (data) => {
+          if (data.error) {
+            this.messageHandlers.delete(requestId);
+            reject(new Error(data.error));
+          } else if (data.done) {
+            this.messageHandlers.delete(requestId);
+            resolve(fullResponse);
+          } else if (data.chunk) {
+            fullResponse += data.chunk;
+            if (onStream) {
+              onStream(data.chunk);
+            }
+          }
+        });
+
+        const message: WSMessage = {
+          type: 'chat_with_files',
+          data: { messages, model, files: filesData },
+          requestId,
+        };
+
+        this.ws.send(JSON.stringify(message));
+
+        // Timeout after 3 minutes (longer for file processing)
+        setTimeout(() => {
+          if (this.messageHandlers.has(requestId)) {
+            this.messageHandlers.delete(requestId);
+            reject(new Error('Chat with files request timeout'));
+          }
+        }, 180000);
+
+      } catch (error) {
+        reject(new Error(`File processing error: ${error}`));
+      }
     });
   }
 

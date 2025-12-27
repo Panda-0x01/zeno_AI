@@ -1,0 +1,16 @@
+This is a sample text file for testing the AI file processing functionality.
+
+The file contains:
+- Multiple lines of text
+- Some code examples:
+
+function greet(name) {
+    return `Hello, ${name}!`;
+}
+
+- And some markdown formatting:
+# Header
+**Bold text**
+*Italic text*
+
+This should help test how well the AI can understand and respond to text file content.

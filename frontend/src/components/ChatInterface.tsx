@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useAppStore } from '../store/appStore';
 import MessageList from './MessageList';
 import ChatInput from './ChatInput';
@@ -19,8 +19,13 @@ export default function ChatInterface() {
   const currentConversation = conversations.find((c) => c.id === currentConversationId);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const handleSendMessage = async (content: string) => {
-    console.log('[SEND] handleSendMessage called', { backendService: !!backendService, currentConversation: !!currentConversation, isGenerating });
+  const handleSendMessage = async (content: string, attachments?: File[]) => {
+    console.log('[SEND] handleSendMessage called', { 
+      backendService: !!backendService, 
+      currentConversation: !!currentConversation, 
+      isGenerating,
+      attachments: attachments?.length || 0
+    });
     
     if (!backendService || !currentConversation || isGenerating) {
       console.log('[SEND] Blocked - missing requirements');
@@ -28,11 +33,25 @@ export default function ChatInterface() {
     }
 
     console.log('[SEND] Sending message:', content);
+    
+    // Process attachments if any
+    let messageContent = content;
+    if (attachments && attachments.length > 0) {
+      const attachmentInfo = attachments.map(file => {
+        if (file.type.startsWith('image/')) {
+          return `[Image: ${file.name} (${(file.size / 1024).toFixed(1)}KB)]`;
+        } else {
+          return `[File: ${file.name} (${(file.size / 1024).toFixed(1)}KB)]`;
+        }
+      }).join('\n');
+      
+      messageContent = attachmentInfo + (content ? '\n\n' + content : '');
+    }
+    
     // Add user message
-    addMessage({ role: 'user', content });
+    addMessage({ role: 'user', content: messageContent });
 
     // Add assistant message placeholder
-    const assistantMessageId = crypto.randomUUID();
     addMessage({
       role: 'assistant',
       content: '',
@@ -73,28 +92,56 @@ export default function ChatInterface() {
         }
       }, 10000); // 10 second timeout
 
-      await backendService.sendChat(
-        messages,
-        currentModel,
-        (chunk) => {
-          hasReceivedData = true;
-          clearTimeout(timeoutId);
-          fullResponse += chunk;
-          
-          // Find the assistant message and update it
-          const conv = useAppStore.getState().conversations.find(
-            (c) => c.id === currentConversationId
-          );
-          const lastMessage = conv?.messages[conv.messages.length - 1];
-          
-          if (lastMessage && lastMessage.role === 'assistant') {
-            updateMessage(lastMessage.id, {
-              content: fullResponse,
-              streaming: true,
-            });
+      // Choose the appropriate chat method based on whether files are attached
+      if (attachments && attachments.length > 0) {
+        console.log('[SEND] Sending chat with files:', attachments.map(f => f.name));
+        await backendService.sendChatWithFiles(
+          messages,
+          currentModel,
+          attachments,
+          (chunk) => {
+            hasReceivedData = true;
+            clearTimeout(timeoutId);
+            fullResponse += chunk;
+            
+            // Find the assistant message and update it
+            const conv = useAppStore.getState().conversations.find(
+              (c) => c.id === currentConversationId
+            );
+            const lastMessage = conv?.messages[conv.messages.length - 1];
+            
+            if (lastMessage && lastMessage.role === 'assistant') {
+              updateMessage(lastMessage.id, {
+                content: fullResponse,
+                streaming: true,
+              });
+            }
           }
-        }
-      );
+        );
+      } else {
+        await backendService.sendChat(
+          messages,
+          currentModel,
+          (chunk) => {
+            hasReceivedData = true;
+            clearTimeout(timeoutId);
+            fullResponse += chunk;
+            
+            // Find the assistant message and update it
+            const conv = useAppStore.getState().conversations.find(
+              (c) => c.id === currentConversationId
+            );
+            const lastMessage = conv?.messages[conv.messages.length - 1];
+            
+            if (lastMessage && lastMessage.role === 'assistant') {
+              updateMessage(lastMessage.id, {
+                content: fullResponse,
+                streaming: true,
+              });
+            }
+          }
+        );
+      }
 
       clearTimeout(timeoutId);
 

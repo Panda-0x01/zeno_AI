@@ -21,7 +21,18 @@
     "test:integration": "jest --config jest.integration.config.js",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "clean": "rimraf dist frontend/dist backend/__pycache__ backend/.pytest_cache",
-    "postinstall": "cd frontend && npm install"
+    "postinstall": "cd frontend && npm install",
+    "start:all": "concurrently \"npm run start:ollama\" \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:ollama": "ollama serve",
+    "start:backend": "cd backend && python main.py",
+    "start:frontend": "cd frontend && npm run dev",
+    "setup:complete": "npm run setup:backend && npm run setup:frontend && npm run setup:models",
+    "setup:backend": "cd backend && pip install -r requirements.txt",
+    "setup:frontend": "cd frontend && npm install",
+    "setup:models": "ollama pull llama3.2:1b",
+    "health:check": "curl http://127.0.0.1:8765/health && curl http://localhost:11434/api/tags",
+    "stop:all": "taskkill /F /IM python.exe /T && taskkill /F /IM ollama.exe /T && taskkill /F /IM node.exe /T",
+    "restart": "npm run stop:all && timeout /t 3 && npm run start:all"
   },
   "keywords": [
     "ai",

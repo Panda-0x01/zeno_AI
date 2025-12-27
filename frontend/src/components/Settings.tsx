@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAppStore } from '../store/appStore';
+import VoiceTest from './VoiceTest';
 import { X, Moon, Sun } from 'lucide-react';
 import './Settings.css';
 
@@ -164,6 +165,11 @@ export default function Settings() {
                 />
               )}
             </div>
+          </section>
+
+          {/* Voice Test */}
+          <section className="settings-section">
+            <VoiceTest />
           </section>
 
           {/* Security & Privacy */}

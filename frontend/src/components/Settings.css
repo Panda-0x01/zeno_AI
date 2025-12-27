@@ -230,3 +230,139 @@
 .button.secondary:hover {
   background-color: var(--bg-tertiary);
 }
+/* Voice Test Component Styles */
+.voice-test {
+  padding: 0;
+}
+
+.voice-test h3 {
+  margin: 0 0 1rem 0;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+}
+
+.test-controls {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.test-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.test-button:hover:not(:disabled) {
+  background-color: var(--bg-tertiary);
+  border-color: var(--accent);
+}
+
+.test-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.test-button.recording {
+  background-color: #ef4444;
+  color: white;
+  border-color: #ef4444;
+  animation: pulse 1.5s infinite;
+}
+
+.test-button.speaking {
+  background-color: #10b981;
+  color: white;
+  border-color: #10b981;
+}
+
+.transcript {
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  font-family: monospace;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.test-results {
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  max-height: 200px;
+  overflow-y: auto;
+  font-family: monospace;
+  font-size: 0.8rem;
+}
+
+.test-result {
+  margin-bottom: 0.25rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.test-help {
+  background-color: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 6px;
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.test-help p {
+  margin: 0 0 0.5rem 0;
+}
+
+.test-help ol {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.test-help li {
+  margin-bottom: 0.25rem;
+}
+
+.test-help a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.test-help a:hover {
+  text-decoration: underline;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.02);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .test-controls {
+    flex-direction: column;
+  }
+  
+  .test-button {
+    justify-content: center;
+  }
+}

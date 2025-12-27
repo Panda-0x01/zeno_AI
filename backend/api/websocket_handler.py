@@ -1,10 +1,12 @@
 import json
-from typing import Any, Dict
+import base64
+from typing import Any, Dict, List, Tuple
 from fastapi import WebSocket
 
 from services.ollama_service import OllamaService
 from services.action_service import ActionService
 from services.database_service import DatabaseService
+from services.file_service import FileService
 from security.audit_logger import AuditLogger
 
 
@@ -16,6 +18,7 @@ class WebSocketHandler:
         self.action_service = ActionService(audit_logger)
         self.audit_logger = audit_logger
         self.db_service = db_service
+        self.file_service = FileService()
     
     async def handle_connection(self, websocket: WebSocket):
         """Handle WebSocket connection lifecycle"""
@@ -52,12 +55,101 @@ class WebSocketHandler:
                 await self.handle_load_messages(websocket, msg_data, request_id)
             elif msg_type == "delete_conversation":
                 await self.handle_delete_conversation(websocket, msg_data, request_id)
+            elif msg_type == "chat_with_files":
+                await self.handle_chat_with_files(websocket, msg_data, request_id)
             else:
                 await self.send_error(websocket, f"Unknown message type: {msg_type}", request_id)
         
         except Exception as e:
             await self.send_error(websocket, str(e), request_id)
     
+    async def handle_chat_with_files(self, websocket: WebSocket, data: Dict[str, Any], request_id: str):
+        """Handle chat message with file attachments"""
+        messages = data.get("messages", [])
+        model = data.get("model", "llama3.2:1b")
+        files_data = data.get("files", [])  # List of {filename, content_type, data} objects
+        
+        print(f"[CHAT_FILES] Received chat request - Model: {model}, Messages: {len(messages)}, Files: {len(files_data)}")
+        
+        # Process files if any
+        processed_files = []
+        if files_data:
+            try:
+                # Convert base64 file data back to bytes
+                file_tuples = []
+                for file_info in files_data:
+                    filename = file_info.get("filename", "unknown")
+                    content_type = file_info.get("content_type", "application/octet-stream")
+                    base64_data = file_info.get("data", "")
+                    
+                    # Decode base64 data
+                    try:
+                        file_bytes = base64.b64decode(base64_data)
+                        file_tuples.append((filename, content_type, file_bytes))
+                    except Exception as e:
+                        print(f"[CHAT_FILES] Error decoding file {filename}: {e}")
+                        continue
+                
+                # Process files
+                processed_files = await self.file_service.process_files(file_tuples)
+                print(f"[CHAT_FILES] Processed {len(processed_files)} files")
+                
+            except Exception as e:
+                print(f"[CHAT_FILES] Error processing files: {e}")
+                await self.send_error(websocket, f"File processing error: {str(e)}", request_id)
+                return
+        
+        # Create enhanced messages with file context
+        enhanced_messages = messages.copy()
+        
+        if processed_files:
+            # Add file context to the last user message
+            file_context = self.file_service.create_file_context_for_ai(processed_files)
+            
+            if enhanced_messages and enhanced_messages[-1].get("role") == "user":
+                original_content = enhanced_messages[-1].get("content", "")
+                enhanced_messages[-1]["content"] = f"{file_context}\n\n{original_content}" if original_content else file_context
+            else:
+                # Add as new user message if no user message exists
+                enhanced_messages.append({
+                    "role": "user",
+                    "content": file_context
+                })
+        
+        # Log request
+        self.audit_logger.log_action("chat_with_files_request", {
+            "model": model,
+            "message_count": len(messages),
+            "file_count": len(processed_files),
+            "file_types": [f.get("type", "unknown") for f in processed_files]
+        })
+        
+        try:
+            print(f"[CHAT_FILES] Starting stream from Ollama...")
+            # Stream response
+            chunk_count = 0
+            async for chunk in self.ollama_service.chat_stream(enhanced_messages, model):
+                chunk_count += 1
+                if chunk_count == 1:
+                    print(f"[CHAT_FILES] First chunk received!")
+                await websocket.send_json({
+                    "type": "stream",
+                    "data": {"chunk": chunk, "done": False},
+                    "requestId": request_id,
+                })
+            
+            print(f"[CHAT_FILES] Stream complete - {chunk_count} chunks sent")
+            # Send completion
+            await websocket.send_json({
+                "type": "stream",
+                "data": {"done": True},
+                "requestId": request_id,
+            })
+        
+        except Exception as e:
+            print(f"[CHAT_FILES ERROR] {str(e)}")
+            await self.send_error(websocket, f"Chat with files error: {str(e)}", request_id)
+
     async def handle_chat(self, websocket: WebSocket, data: Dict[str, Any], request_id: str):
         """Handle chat message with streaming"""
         messages = data.get("messages", [])
